@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.universidad.sistemadmision.controller.MainController">
+   <top>
+      <VBox spacing="10.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label text="Sistema de Admisión Universitaria" textAlignment="CENTER">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label text="Archivo de Claves:" />
+                  <TextField fx:id="txtRutaClaves" editable="false" prefHeight="25.0" prefWidth="400.0" promptText="Seleccione el archivo CLAVES.dbf" />
+                  <Button fx:id="btnCargarClaves" mnemonicParsing="false" onAction="#cargarClaves" text="Cargar" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label text="Archivo de Identificadores:" />
+                  <TextField fx:id="txtRutaIdentificadores" editable="false" prefHeight="25.0" prefWidth="400.0" promptText="Seleccione el archivo IDENTIFICADOR.dbf" />
+                  <Button fx:id="btnCargarIdentificadores" mnemonicParsing="false" onAction="#cargarIdentificadores" text="Cargar" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label text="Archivo de Respuestas:" />
+                  <TextField fx:id="txtRutaRespuestas" editable="false" prefHeight="25.0" prefWidth="400.0" promptText="Seleccione el archivo RESPUESTAS.dbf" />
+                  <Button fx:id="btnCargarRespuestas" mnemonicParsing="false" onAction="#cargarRespuestas" text="Cargar" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label text="Puntos por respuesta correcta:" />
+                  <TextField fx:id="txtPuntoCorrecta" prefHeight="25.0" prefWidth="80.0" text="1.0" />
+                  <Label text="Puntos por respuesta incorrecta:" />
+                  <TextField fx:id="txtPuntoIncorrecta" prefHeight="25.0" prefWidth="80.0" text="-0.25" />
+                  <Label text="Puntos por respuesta vacía:" />
+                  <TextField fx:id="txtPuntoVacia" prefHeight="25.0" prefWidth="80.0" text="0.0" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" spacing="10.0">
+               <children>
+                  <Button fx:id="btnProcesar" mnemonicParsing="false" onAction="#procesarResultados" prefHeight="30.0" prefWidth="150.0" text="Procesar Resultados" />
+                  <Label text="Ordenar por:" />
+                  <ComboBox fx:id="cmbOrdenar" prefWidth="200.0" />
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+      </VBox>
+   </top>
+   <center>
+      <TableView fx:id="tblResultados" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <columns>
+          <TableColumn fx:id="colCodigo" prefWidth="100.0" text="Código" />
+          <TableColumn fx:id="colTema" prefWidth="75.0" text="Tema" />
+            <TableColumn fx:id="colCorrectas" prefWidth="100.0" text="Correctas" />
+            <TableColumn fx:id="colIncorrectas" prefWidth="100.0" text="Incorrectas" />
+            <TableColumn fx:id="colVacias" prefWidth="100.0" text="Vacías" />
+            <TableColumn fx:id="colPuntaje" prefWidth="100.0" text="Puntaje" />
+        </columns>
+         <BorderPane.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </BorderPane.margin>
+      </TableView>
+   </center>
+</BorderPane>
