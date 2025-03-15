@@ -1,7 +1,8 @@
 com\universidad\sistemadmision\controller\MainController.class
 com\universidad\sistemadmision\Main.class
+com\universidad\sistemadmision\controller\SplashController.class
 com\universidad\sistemadmision\model\Respuesta.class
-com\universidad\sistemadmision\model\Identificador.class
 com\universidad\sistemadmision\model\Resultado.class
 com\universidad\sistemadmision\model\Clave.class
 com\universidad\sistemadmision\service\DBFService.class
+com\universidad\sistemadmision\model\Identificador.class

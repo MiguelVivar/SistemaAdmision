@@ -1,29 +1,32 @@
 package com.universidad.sistemadmision.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
+import java.util.ResourceBundle;
+
 import com.universidad.sistemadmision.model.Clave;
 import com.universidad.sistemadmision.model.Identificador;
 import com.universidad.sistemadmision.model.Respuesta;
 import com.universidad.sistemadmision.model.Resultado;
 import com.universidad.sistemadmision.service.DBFService;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.List;
-import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
 
@@ -44,6 +47,15 @@ public class MainController implements Initializable {
     
     @FXML
     private TextField txtPuntoVacia;
+    
+    @FXML
+    private Label lblEstadoClaves;
+    
+    @FXML
+    private Label lblEstadoIdentificadores;
+    
+    @FXML
+    private Label lblEstadoRespuestas;
     
     @FXML
     private Button btnCargarClaves;
@@ -118,6 +130,11 @@ public class MainController implements Initializable {
         txtPuntoCorrecta.setText("1.0");
         txtPuntoIncorrecta.setText("-0.25");
         txtPuntoVacia.setText("0.0");
+        
+        // Inicializar etiquetas de estado
+        lblEstadoClaves.getStyleClass().add("estado-no-cargado");
+        lblEstadoIdentificadores.getStyleClass().add("estado-no-cargado");
+        lblEstadoRespuestas.getStyleClass().add("estado-no-cargado");
     }
     
     public void setPrimaryStage(Stage primaryStage) {
@@ -136,9 +153,18 @@ public class MainController implements Initializable {
             try {
                 claves = dbfService.cargarClaves(file.getAbsolutePath());
                 txtRutaClaves.setText(file.getAbsolutePath());
+                
+                // Actualizar indicador visual
+                lblEstadoClaves.setText("Cargado ✓");
+                lblEstadoClaves.getStyleClass().remove("estado-no-cargado");
+                lblEstadoClaves.getStyleClass().add("estado-cargado");
+                
                 mostrarAlerta(Alert.AlertType.INFORMATION, "Claves cargadas", 
                         "Se han cargado " + claves.size() + " claves correctamente.");
             } catch (IOException e) {
+                // Mantener indicador de no cargado
+                lblEstadoClaves.setText("Error al cargar");
+                
                 mostrarAlerta(Alert.AlertType.ERROR, "Error", 
                         "Error al cargar el archivo: " + e.getMessage());
             }
@@ -157,9 +183,18 @@ public class MainController implements Initializable {
             try {
                 identificadores = dbfService.cargarIdentificadores(file.getAbsolutePath());
                 txtRutaIdentificadores.setText(file.getAbsolutePath());
+                
+                // Actualizar indicador visual
+                lblEstadoIdentificadores.setText("Cargado ✓");
+                lblEstadoIdentificadores.getStyleClass().remove("estado-no-cargado");
+                lblEstadoIdentificadores.getStyleClass().add("estado-cargado");
+                
                 mostrarAlerta(Alert.AlertType.INFORMATION, "Identificadores cargados", 
                         "Se han cargado " + identificadores.size() + " identificadores correctamente.");
             } catch (IOException e) {
+                // Mantener indicador de no cargado
+                lblEstadoIdentificadores.setText("Error al cargar");
+                
                 mostrarAlerta(Alert.AlertType.ERROR, "Error", 
                         "Error al cargar el archivo: " + e.getMessage());
             }
@@ -178,9 +213,18 @@ public class MainController implements Initializable {
             try {
                 respuestas = dbfService.cargarRespuestas(file.getAbsolutePath());
                 txtRutaRespuestas.setText(file.getAbsolutePath());
+                
+                // Actualizar indicador visual
+                lblEstadoRespuestas.setText("Cargado ✓");
+                lblEstadoRespuestas.getStyleClass().remove("estado-no-cargado");
+                lblEstadoRespuestas.getStyleClass().add("estado-cargado");
+                
                 mostrarAlerta(Alert.AlertType.INFORMATION, "Respuestas cargadas", 
                         "Se han cargado " + respuestas.size() + " respuestas correctamente.");
             } catch (IOException e) {
+                // Mantener indicador de no cargado
+                lblEstadoRespuestas.setText("Error al cargar");
+                
                 mostrarAlerta(Alert.AlertType.ERROR, "Error", 
                         "Error al cargar el archivo: " + e.getMessage());
             }
