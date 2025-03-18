@@ -78,6 +78,9 @@ public class MainController implements Initializable {
     private Button btnExportarExcel;
     
     @FXML
+    private Button btnExportarCSV;
+    
+    @FXML
     private TableView<Resultado> tblResultados;
     
     @FXML
@@ -97,6 +100,15 @@ public class MainController implements Initializable {
     
     @FXML
     private TableColumn<Resultado, Double> colPuntaje;
+    
+    @FXML
+    private TableColumn<Resultado, Integer> colOrdenMerito;
+    
+    @FXML
+    private TableColumn<Resultado, String> colCondicion;
+    
+    @FXML
+    private TextField txtCantidadVacantes;
     
     @FXML
     private ComboBox<String> cmbOrdenar;
@@ -122,6 +134,8 @@ public class MainController implements Initializable {
         colIncorrectas.setCellValueFactory(new PropertyValueFactory<>("incorrectas"));
         colVacias.setCellValueFactory(new PropertyValueFactory<>("vacias"));
         colPuntaje.setCellValueFactory(new PropertyValueFactory<>("puntaje"));
+        colOrdenMerito.setCellValueFactory(new PropertyValueFactory<>("ordenMerito"));
+        colCondicion.setCellValueFactory(new PropertyValueFactory<>("condicion"));
         
         tblResultados.setItems(resultados);
         
@@ -253,6 +267,7 @@ public class MainController implements Initializable {
             double puntoPorCorrecta = Double.parseDouble(txtPuntoCorrecta.getText());
             double puntoPorIncorrecta = Double.parseDouble(txtPuntoIncorrecta.getText());
             double puntoPorVacia = Double.parseDouble(txtPuntoVacia.getText());
+            int cantidadVacantes = Integer.parseInt(txtCantidadVacantes.getText());
             
             List<Resultado> listaResultados = dbfService.calcularResultados(
                     claves, identificadores, respuestas, 
@@ -260,6 +275,22 @@ public class MainController implements Initializable {
             
             resultados.clear();
             resultados.addAll(listaResultados);
+            
+            // Ordenar por puntaje de mayor a menor para asignar orden de mérito
+            FXCollections.sort(resultados, (r1, r2) -> Double.compare(r2.getPuntaje(), r1.getPuntaje()));
+            
+            // Asignar orden de mérito y condición
+            for (int i = 0; i < resultados.size(); i++) {
+                Resultado resultado = resultados.get(i);
+                resultado.setOrdenMerito(i + 1); // El orden de mérito empieza en 1
+                
+                // Asignar condición según cantidad de vacantes
+                if (i < cantidadVacantes) {
+                    resultado.setCondicion("INGRESO");
+                } else {
+                    resultado.setCondicion("NO INGRESO");
+                }
+            }
             
             // Ordenar según la selección actual
             ordenarResultados();
@@ -367,6 +398,37 @@ public class MainController implements Initializable {
             } catch (IOException e) {
                 mostrarAlerta(Alert.AlertType.ERROR, "Error", 
                         "Error al exportar a Excel: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    @FXML
+    private void exportarACSV(ActionEvent event) {
+        if (resultados.isEmpty()) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Sin datos", 
+                    "No hay resultados para exportar. Procese los datos primero.");
+            return;
+        }
+        
+        // Ordenar resultados por puntaje de mayor a menor antes de exportar
+        FXCollections.sort(resultados, (r1, r2) -> Double.compare(r2.getPuntaje(), r1.getPuntaje()));
+        
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Guardar archivo CSV");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Archivos CSV", "*.csv"));
+        fileChooser.setInitialFileName("resultados_admision.csv");
+        File file = fileChooser.showSaveDialog(primaryStage);
+        
+        if (file != null) {
+            try {
+                exportService.exportarACSV(resultados, file.getAbsolutePath());
+                mostrarAlerta(Alert.AlertType.INFORMATION, "Exportación exitosa", 
+                        "Los resultados se han exportado correctamente a CSV.");
+            } catch (IOException e) {
+                mostrarAlerta(Alert.AlertType.ERROR, "Error", 
+                        "Error al exportar a CSV: " + e.getMessage());
                 e.printStackTrace();
             }
         }

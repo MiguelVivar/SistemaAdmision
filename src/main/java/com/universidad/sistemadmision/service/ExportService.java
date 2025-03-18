@@ -11,6 +11,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
@@ -46,25 +47,21 @@ public class ExportService {
         documento.add(new Paragraph(" "));
         
         // Crear tabla
-        PdfPTable tabla = new PdfPTable(6); // 6 columnas
+        PdfPTable tabla = new PdfPTable(8); // 8 columnas
         tabla.setWidthPercentage(100);
-        tabla.setSpacingBefore(10f);
-        tabla.setSpacingAfter(10f);
-        
-        // Establecer anchos relativos de las columnas
-        float[] anchos = {2f, 1.5f, 1.5f, 1.5f, 1.5f, 2f};
-        tabla.setWidths(anchos);
         
         // Agregar encabezados
         Font fuenteEncabezado = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.WHITE);
         BaseColor colorEncabezado = new BaseColor(204, 122, 41); // #cc7a29
         
+        agregarCeldaEncabezado(tabla, "Orden Mérito", fuenteEncabezado, colorEncabezado);
         agregarCeldaEncabezado(tabla, "Código", fuenteEncabezado, colorEncabezado);
         agregarCeldaEncabezado(tabla, "Tema", fuenteEncabezado, colorEncabezado);
         agregarCeldaEncabezado(tabla, "Correctas", fuenteEncabezado, colorEncabezado);
         agregarCeldaEncabezado(tabla, "Incorrectas", fuenteEncabezado, colorEncabezado);
         agregarCeldaEncabezado(tabla, "Vacías", fuenteEncabezado, colorEncabezado);
         agregarCeldaEncabezado(tabla, "Puntaje", fuenteEncabezado, colorEncabezado);
+        agregarCeldaEncabezado(tabla, "Condición", fuenteEncabezado, colorEncabezado);
         
         // Agregar datos
         Font fuenteNormal = FontFactory.getFont(FontFactory.HELVETICA, 10, BaseColor.BLACK);
@@ -75,12 +72,14 @@ public class ExportService {
         for (Resultado resultado : resultados) {
             BaseColor colorFila = esPar ? colorFilaPar : colorFilaImpar;
             
+            agregarCelda(tabla, String.valueOf(resultado.getOrdenMerito()), fuenteNormal, colorFila);
             agregarCelda(tabla, resultado.getCodigo(), fuenteNormal, colorFila);
             agregarCelda(tabla, resultado.getTema(), fuenteNormal, colorFila);
             agregarCelda(tabla, String.valueOf(resultado.getCorrectas()), fuenteNormal, colorFila);
             agregarCelda(tabla, String.valueOf(resultado.getIncorrectas()), fuenteNormal, colorFila);
             agregarCelda(tabla, String.valueOf(resultado.getVacias()), fuenteNormal, colorFila);
             agregarCelda(tabla, String.format("%.2f", resultado.getPuntaje()), fuenteNormal, colorFila);
+            agregarCelda(tabla, resultado.getCondicion(), fuenteNormal, colorFila);
             
             esPar = !esPar;
         }
@@ -162,7 +161,7 @@ public class ExportService {
         
         // Crear fila de encabezado
         Row filaEncabezado = sheet.createRow(0);
-        String[] encabezados = {"Código", "Tema", "Correctas", "Incorrectas", "Vacías", "Puntaje"};
+        String[] encabezados = {"Orden Mérito", "Código", "Tema", "Correctas", "Incorrectas", "Vacías", "Puntaje", "Condición"};
         
         for (int i = 0; i < encabezados.length; i++) {
             Cell celda = filaEncabezado.createCell(i);
@@ -176,29 +175,37 @@ public class ExportService {
             Row fila = sheet.createRow(numeroFila++);
             CellStyle estiloActual = (numeroFila % 2 == 0) ? estiloCeldaPar : estiloCelda;
             
-            Cell celdaCodigo = fila.createCell(0);
+            Cell celdaOrdenMerito = fila.createCell(0);
+            celdaOrdenMerito.setCellValue(resultado.getOrdenMerito());
+            celdaOrdenMerito.setCellStyle(estiloActual);
+            
+            Cell celdaCodigo = fila.createCell(1);
             celdaCodigo.setCellValue(resultado.getCodigo());
             celdaCodigo.setCellStyle(estiloActual);
             
-            Cell celdaTema = fila.createCell(1);
+            Cell celdaTema = fila.createCell(2);
             celdaTema.setCellValue(resultado.getTema());
             celdaTema.setCellStyle(estiloActual);
             
-            Cell celdaCorrectas = fila.createCell(2);
+            Cell celdaCorrectas = fila.createCell(3);
             celdaCorrectas.setCellValue(resultado.getCorrectas());
             celdaCorrectas.setCellStyle(estiloActual);
             
-            Cell celdaIncorrectas = fila.createCell(3);
+            Cell celdaIncorrectas = fila.createCell(4);
             celdaIncorrectas.setCellValue(resultado.getIncorrectas());
             celdaIncorrectas.setCellStyle(estiloActual);
             
-            Cell celdaVacias = fila.createCell(4);
+            Cell celdaVacias = fila.createCell(5);
             celdaVacias.setCellValue(resultado.getVacias());
             celdaVacias.setCellStyle(estiloActual);
             
-            Cell celdaPuntaje = fila.createCell(5);
+            Cell celdaPuntaje = fila.createCell(6);
             celdaPuntaje.setCellValue(resultado.getPuntaje());
             celdaPuntaje.setCellStyle(estiloActual);
+            
+            Cell celdaCondicion = fila.createCell(7);
+            celdaCondicion.setCellValue(resultado.getCondicion());
+            celdaCondicion.setCellStyle(estiloActual);
         }
         
         // Ajustar ancho de columnas automáticamente
@@ -212,5 +219,49 @@ public class ExportService {
         }
         
         workbook.close();
+    }
+    
+    /**
+     * Exporta los resultados a un archivo CSV
+     * @param resultados Lista de resultados a exportar
+     * @param rutaArchivo Ruta donde se guardará el archivo CSV
+     * @throws IOException Si ocurre un error de E/S
+     */
+    public void exportarACSV(List<Resultado> resultados, String rutaArchivo) throws IOException {
+        // Asegurar que el directorio exista
+        File archivo = new File(rutaArchivo);
+        File directorio = archivo.getParentFile();
+        if (directorio != null && !directorio.exists()) {
+            if (!directorio.mkdirs()) {
+                throw new IOException("No se pudo crear el directorio: " + directorio.getAbsolutePath());
+            }
+        }
+        
+        try (FileWriter writer = new FileWriter(archivo)) {
+            // Escribir encabezados
+            writer.append("Orden Mérito,Código,Tema,Correctas,Incorrectas,Vacías,Puntaje,Condición\n");
+            
+            // Escribir datos
+            for (Resultado resultado : resultados) {
+                writer.append(String.valueOf(resultado.getOrdenMerito()))
+                      .append(",")
+                      .append(resultado.getCodigo())
+                      .append(",")
+                      .append(resultado.getTema())
+                      .append(",")
+                      .append(String.valueOf(resultado.getCorrectas()))
+                      .append(",")
+                      .append(String.valueOf(resultado.getIncorrectas()))
+                      .append(",")
+                      .append(String.valueOf(resultado.getVacias()))
+                      .append(",")
+                      .append(String.format("%.2f", resultado.getPuntaje()))
+                      .append(",")
+                      .append(resultado.getCondicion())
+                      .append("\n");
+            }
+            
+            writer.flush();
+        }
     }
 }

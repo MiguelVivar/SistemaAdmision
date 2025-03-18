@@ -7,6 +7,8 @@ public class Resultado implements Comparable<Resultado> {
     private int incorrectas;
     private int vacias;
     private double puntaje;
+    private int ordenMerito; // Puesto según puntaje
+    private String condicion; // INGRESO o NO INGRESO
     
     public Resultado() {
     }
@@ -80,6 +82,22 @@ public class Resultado implements Comparable<Resultado> {
         this.puntaje = puntaje;
     }
     
+    public int getOrdenMerito() {
+        return ordenMerito;
+    }
+    
+    public void setOrdenMerito(int ordenMerito) {
+        this.ordenMerito = ordenMerito;
+    }
+    
+    public String getCondicion() {
+        return condicion;
+    }
+    
+    public void setCondicion(String condicion) {
+        this.condicion = condicion;
+    }
+    
     public void calcularPuntaje(double puntoPorCorrecta, double puntoPorIncorrecta, double puntoPorVacia) {
         this.puntaje = (this.correctas * puntoPorCorrecta) + (this.incorrectas * puntoPorIncorrecta) + (this.vacias * puntoPorVacia);
     }
@@ -98,6 +116,8 @@ public class Resultado implements Comparable<Resultado> {
                 ", correctas=" + correctas +
                 ", incorrectas=" + incorrectas +
                 ", vacias=" + vacias +
+                ", ordenMerito=" + ordenMerito +
+                ", condicion='" + condicion + '\'' +
                 ", puntaje=" + puntaje +
                 '}';
     }
