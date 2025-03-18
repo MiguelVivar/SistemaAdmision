@@ -6,11 +6,13 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import com.itextpdf.text.DocumentException;
 import com.universidad.sistemadmision.model.Clave;
 import com.universidad.sistemadmision.model.Identificador;
 import com.universidad.sistemadmision.model.Respuesta;
 import com.universidad.sistemadmision.model.Resultado;
 import com.universidad.sistemadmision.service.DBFService;
+import com.universidad.sistemadmision.service.ExportService;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -70,6 +72,12 @@ public class MainController implements Initializable {
     private Button btnProcesar;
     
     @FXML
+    private Button btnExportarPDF;
+    
+    @FXML
+    private Button btnExportarExcel;
+    
+    @FXML
     private TableView<Resultado> tblResultados;
     
     @FXML
@@ -95,6 +103,7 @@ public class MainController implements Initializable {
     
     private Stage primaryStage;
     private DBFService dbfService;
+    private ExportService exportService;
     private List<Clave> claves;
     private List<Identificador> identificadores;
     private List<Respuesta> respuestas;
@@ -103,6 +112,7 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         dbfService = new DBFService();
+        exportService = new ExportService();
         resultados = FXCollections.observableArrayList();
         
         // Configurar la tabla
@@ -298,5 +308,67 @@ public class MainController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();
+    }
+    
+    @FXML
+    private void exportarAPDF(ActionEvent event) {
+        if (resultados.isEmpty()) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Sin datos", 
+                    "No hay resultados para exportar. Procese los datos primero.");
+            return;
+        }
+        
+        // Ordenar resultados por puntaje de mayor a menor antes de exportar
+        FXCollections.sort(resultados, (r1, r2) -> Double.compare(r2.getPuntaje(), r1.getPuntaje()));
+        
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Guardar archivo PDF");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Archivos PDF", "*.pdf"));
+        fileChooser.setInitialFileName("resultados_admision.pdf");
+        File file = fileChooser.showSaveDialog(primaryStage);
+        
+        if (file != null) {
+            try {
+                exportService.exportarAPDF(resultados, file.getAbsolutePath());
+                mostrarAlerta(Alert.AlertType.INFORMATION, "Exportación exitosa", 
+                        "Los resultados se han exportado correctamente a PDF.");
+            } catch (DocumentException | IOException e) {
+                mostrarAlerta(Alert.AlertType.ERROR, "Error", 
+                        "Error al exportar a PDF: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    @FXML
+    private void exportarAExcel(ActionEvent event) {
+        if (resultados.isEmpty()) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Sin datos", 
+                    "No hay resultados para exportar. Procese los datos primero.");
+            return;
+        }
+        
+        // Ordenar resultados por puntaje de mayor a menor antes de exportar
+        FXCollections.sort(resultados, (r1, r2) -> Double.compare(r2.getPuntaje(), r1.getPuntaje()));
+        
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Guardar archivo Excel");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Archivos Excel", "*.xlsx"));
+        fileChooser.setInitialFileName("resultados_admision.xlsx");
+        File file = fileChooser.showSaveDialog(primaryStage);
+        
+        if (file != null) {
+            try {
+                exportService.exportarAExcel(resultados, file.getAbsolutePath());
+                mostrarAlerta(Alert.AlertType.INFORMATION, "Exportación exitosa", 
+                        "Los resultados se han exportado correctamente a Excel.");
+            } catch (IOException e) {
+                mostrarAlerta(Alert.AlertType.ERROR, "Error", 
+                        "Error al exportar a Excel: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
     }
 }

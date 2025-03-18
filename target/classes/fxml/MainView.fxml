@@ -93,6 +93,8 @@
                   <Button fx:id="btnProcesar" mnemonicParsing="false" onAction="#procesarResultados" prefHeight="40.0" prefWidth="200.0" styleClass="process-button" text="Procesar Resultados" />
                   <Label text="Ordenar por:" />
                   <ComboBox fx:id="cmbOrdenar" prefWidth="200.0" />
+                  <Button fx:id="btnExportarPDF" mnemonicParsing="false" onAction="#exportarAPDF" prefHeight="40.0" prefWidth="150.0" styleClass="export-button" text="Exportar a PDF" />
+                  <Button fx:id="btnExportarExcel" mnemonicParsing="false" onAction="#exportarAExcel" prefHeight="40.0" prefWidth="150.0" styleClass="export-button" text="Exportar a Excel" />
                </children>
             </HBox>
          </children>

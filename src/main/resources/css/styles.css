@@ -73,6 +73,29 @@
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 2, 0, 0, 1);
 }
 
+/* Estilos para los botones de exportación */
+.export-button {
+    -fx-background-color: linear-gradient(to bottom, #3b7eff, #0045d1);
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 15px;
+    -fx-border-color: #0045d1;
+    -fx-border-width: 0 0 3 0;
+    -fx-border-radius: 5px;
+}
+
+.export-button:hover {
+    -fx-background-color: linear-gradient(to bottom, derive(#3b7eff, 10%), derive(#0045d1, 10%));
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 8, 0, 0, 3);
+    -fx-translate-y: -2px;
+}
+
+.export-button:pressed {
+    -fx-background-color: linear-gradient(to bottom, derive(#3b7eff, -10%), derive(#0045d1, -10%));
+    -fx-translate-y: 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 2, 0, 0, 1);
+}
+
 /* Estilos para los campos de texto */
 .text-field {
     -fx-background-color: white;
